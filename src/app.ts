@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import { SampleController } from "@/controllers/sampleController";
+import { LineNotifyController } from "@/controllers/lineNotifyController";
 import { validationErrorHandler } from "@/middleware/validationErrorHandler";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 SampleController.registerRouter(app);
+LineNotifyController.RegisterRoute(app);
 
 const spec = expressJSDocSwagger(app)(swaggerSetting);
 
