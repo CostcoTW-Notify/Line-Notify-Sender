@@ -1,6 +1,7 @@
 export enum ResponseStatus {
   Success = 0,
-  NotifyTokenInvalid = 101,
+  NotifyTokenInvalid = 401,
+  ProcessPendingMessageFail = 402,
 }
 
 /**

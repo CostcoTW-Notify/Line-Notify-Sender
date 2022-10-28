@@ -4,7 +4,7 @@ import {
 } from "@/models/pendingMessage";
 import { MongoClient, Collection, WithId, ObjectId } from "mongodb";
 
-export class MongoDB {
+export class MongoRepository {
   public lineNotifyCollection: Collection<LineNotifyPendingMessage>;
 
   constructor() {
@@ -36,10 +36,12 @@ export class MongoDB {
     newStatus: pendingStatus
   ): Promise<boolean> {
     await this.lineNotifyCollection.findOne(); // Make sure collection is already connect.
-
+    let updateDate = new Date();
     let bulk = this.lineNotifyCollection.initializeUnorderedBulkOp();
     ids.forEach((id) =>
-      bulk.find({ _id: id }).updateOne({ $set: { pendingStatus: newStatus } })
+      bulk.find({ _id: id }).updateOne({
+        $set: { pendingStatus: newStatus, updateTime: updateDate },
+      })
     );
     let result = await bulk.execute();
     return result.isOk();

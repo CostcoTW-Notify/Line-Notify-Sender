@@ -5,6 +5,7 @@ import expressJSDocSwagger from "express-jsdoc-swagger";
 import { SampleController } from "@/controllers/sampleController";
 import { LineNotifyController } from "@/controllers/lineNotifyController";
 import { validationErrorHandler } from "@/middleware/validationErrorHandler";
+import { PendingMessageController } from "./controllers/pendingMessageController";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(morgan("dev"));
 
 SampleController.registerRouter(app);
 LineNotifyController.RegisterRoute(app);
+PendingMessageController.RegisterRoute(app);
 
 const spec = expressJSDocSwagger(app)(swaggerSetting);
 
