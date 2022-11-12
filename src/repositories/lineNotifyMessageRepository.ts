@@ -1,16 +1,19 @@
 import {
   LineNotifyPendingMessage,
   pendingStatus,
-} from "@/models/pendingMessage";
+} from "@/models/mongoDB/pendingMessage";
 import { MongoRepository } from "./mongoRepository";
 import { Collection, WithId, ObjectId } from "mongodb";
 
 interface ILineNotifyMessageRepository {
-  getAllPendingMessage(): Promise<WithId<LineNotifyPendingMessage>[]>;
+  getMessage(
+    query: any,
+    sort?: any | undefined
+  ): Promise<WithId<LineNotifyPendingMessage>[]>;
 
-  getMessage(query: any): Promise<WithId<LineNotifyPendingMessage>[]>;
+  createOne(message: LineNotifyPendingMessage): Promise<boolean>;
 
-  createMessage(message: LineNotifyPendingMessage): Promise<boolean>;
+  createMany(messages: LineNotifyPendingMessage[]): Promise<boolean>;
 
   updateMessage(message: WithId<LineNotifyPendingMessage>): Promise<void>;
 
@@ -33,16 +36,25 @@ export class LineNotifyMessageRepository
   }
 
   public async getMessage(
-    query: any
+    query: any,
+    sort?: any | undefined
   ): Promise<WithId<LineNotifyPendingMessage>[]> {
-    const result = await this.lineNotifyCollection.find(query).toArray();
+    let search = this.lineNotifyCollection.find(query);
+    if (sort != null) search = search.sort(sort);
+
+    const result = await search.toArray();
     return result;
   }
 
-  public async createMessage(
-    message: LineNotifyPendingMessage
-  ): Promise<boolean> {
+  public async createOne(message: LineNotifyPendingMessage): Promise<boolean> {
     const result = await this.lineNotifyCollection.insertOne(message);
+    return result.acknowledged;
+  }
+
+  public async createMany(
+    messages: LineNotifyPendingMessage[]
+  ): Promise<boolean> {
+    const result = await this.lineNotifyCollection.insertMany(messages);
     return result.acknowledged;
   }
 
@@ -54,17 +66,6 @@ export class LineNotifyMessageRepository
       message
     );
     return result.acknowledged;
-  }
-
-  public async getAllPendingMessage(): Promise<
-    WithId<LineNotifyPendingMessage>[]
-  > {
-    let result = await this.lineNotifyCollection
-      .find({
-        pendingStatus: pendingStatus.Pending,
-      } as LineNotifyPendingMessage)
-      .toArray();
-    return result;
   }
 
   public async bulkUpdateMessageStatus(

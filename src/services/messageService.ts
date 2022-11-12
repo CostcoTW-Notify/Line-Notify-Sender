@@ -1,6 +1,10 @@
-import { pendingStatus } from "@/models/pendingMessage";
+import {
+  pendingStatus,
+  LineNotifyPendingMessage,
+} from "@/models/mongoDB/pendingMessage";
 import { LineNotifyMessageRepository } from "@/repositories/lineNotifyMessageRepository";
 import { LineNotifyApiService } from "@/services/lineNotifyApiService";
+import { throws } from "assert";
 
 interface PendingMessageResult {
   Status: boolean;
@@ -11,6 +15,7 @@ interface PendingMessageResult {
 
 interface IMessageService {
   processPendingMessage(): Promise<PendingMessageResult>;
+  appendPendingMessage(tokens: string[], messages: string[]): Promise<boolean>;
 }
 
 export class MessageService implements IMessageService {
@@ -24,19 +29,37 @@ export class MessageService implements IMessageService {
     this.lineNotifyService = notifyService;
   }
 
+  public async appendPendingMessage(tokens: string[], messages: string[]) {
+    const lineNotifyMessages: LineNotifyPendingMessage[] = [];
+
+    tokens.forEach((tk) => {
+      messages.forEach((msg) => {
+        lineNotifyMessages.push({
+          roomToken: tk,
+          message: msg,
+          pendingStatus: pendingStatus.Pending,
+          createTime: new Date(),
+        });
+      });
+    });
+
+    const result = await this.lineNotifyRepository.createMany(
+      lineNotifyMessages
+    );
+    return result;
+  }
+
   /**
    * processPendingMessage
    */
   public async processPendingMessage() {
-    let allPendingMsg = await this.lineNotifyRepository.getAllPendingMessage();
-    if (allPendingMsg.length === 0)
-      return {
-        Status: false,
-      } as PendingMessageResult;
-
+    const pendingMsg = await this.lineNotifyRepository.getMessage(
+      { pendingStatus: pendingStatus.Pending },
+      { createTime: 1 }
+    );
     let tasks: Promise<boolean>[] = [];
 
-    allPendingMsg.forEach((msg) => {
+    pendingMsg.forEach((msg) => {
       let promise = this.lineNotifyService.sendMessageToChatRoom(
         msg.roomToken,
         msg.message
@@ -55,10 +78,10 @@ export class MessageService implements IMessageService {
 
     for (let idx = 0; idx < results.length; idx++) {
       const result = results[idx];
-      if (result) successList.push(allPendingMsg[idx]._id.toString());
-      else if (allPendingMsg[idx].createTime < dropTime)
-        dropList.push(allPendingMsg[idx]._id.toString());
-      else failList.push(allPendingMsg[idx]._id.toString());
+      if (result) successList.push(pendingMsg[idx]._id.toString());
+      else if (pendingMsg[idx].createTime < dropTime)
+        dropList.push(pendingMsg[idx]._id.toString());
+      else failList.push(pendingMsg[idx]._id.toString());
     }
 
     if (successList.length > 0)
