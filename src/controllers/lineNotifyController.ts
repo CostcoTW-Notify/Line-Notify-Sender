@@ -2,12 +2,7 @@ import { Application, Request } from "express";
 import { body } from "express-validator";
 import { ensureRequestIsValid } from "@/utils/validate";
 import { ApiResponse, ResponseStatus } from "@/models/apiResponse";
-import { LineNotifyService } from "@/services/lineNotifyService";
-import {
-  LineNotifyRoomStatus,
-  LineNotifyToken,
-  SendNotifyMessage,
-} from "@/models/lineNotifyModel";
+import { LineNotifyApiService } from "@/services/lineNotifyApiService";
 
 export class LineNotifyController {
   public static RegisterRoute(app: Application): void {
@@ -24,7 +19,7 @@ export class LineNotifyController {
       body("message").isString(),
       async (req: Request, res) => {
         ensureRequestIsValid(req);
-        const service = new LineNotifyService();
+        const service = new LineNotifyApiService();
         let result = await service.sendMessageToChatRoom(
           req.body.token,
           req.body.message
@@ -52,7 +47,7 @@ export class LineNotifyController {
       body("token").isString(),
       async (req: Request, res) => {
         ensureRequestIsValid(req);
-        const service = new LineNotifyService();
+        const service = new LineNotifyApiService();
         let result = await service.fetchChatRoomStatus(req.body.token);
         if (result.status === 200) {
           res.json(result);
@@ -79,7 +74,7 @@ export class LineNotifyController {
       body("token").isString(),
       async (req: Request, res) => {
         ensureRequestIsValid(req);
-        const service = new LineNotifyService();
+        const service = new LineNotifyApiService();
         let result = await service.revokeChatRoomToken(req.body.token);
         if (result) res.json(new ApiResponse());
         else

@@ -13,11 +13,13 @@ export enum ResponseStatus {
 export class ApiResponse {
   status: number;
   message: string;
+  data?: object;
 
-  constructor(status_code?: ResponseStatus, msg?: string) {
-    if (status_code === undefined) this.status = ResponseStatus.Success;
+  constructor(status_code?: ResponseStatus, msg?: string, data?: object) {
+    if (status_code == null) this.status = ResponseStatus.Success;
     else this.status = status_code;
-    if (msg === undefined) this.message = "Successful";
+    if (msg == null) this.message = "Successful";
     else this.message = msg;
+    if (data != null) this.data = data;
   }
 }

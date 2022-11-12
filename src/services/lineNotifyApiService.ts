@@ -5,7 +5,15 @@ const sendMsg_url = "https://notify-api.line.me/api/notify";
 const getTokenStatus_url = "https://notify-api.line.me/api/status";
 const revokeToken_url = "https://notify-api.line.me/api/revoke";
 
-export class LineNotifyService {
+interface ILineNotifyApiService {
+  sendMessageToChatRoom(token: string, message: string): Promise<boolean>;
+
+  fetchChatRoomStatus(token: string): Promise<LineNotifyRoomStatus>;
+
+  revokeChatRoomToken(token: string): Promise<boolean>;
+}
+
+export class LineNotifyApiService implements ILineNotifyApiService {
   public async sendMessageToChatRoom(token: string, message: string) {
     const params = new URLSearchParams();
     params.append("message", message);
@@ -44,7 +52,7 @@ export class LineNotifyService {
     }
   }
 
-  public async revokeChatRoomToken(token: string): Promise<boolean> {
+  public async revokeChatRoomToken(token: string) {
     try {
       let result = await axios.post<LineNotifyRoomStatus>(
         revokeToken_url,

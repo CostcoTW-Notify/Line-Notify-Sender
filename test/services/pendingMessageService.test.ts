@@ -1,6 +1,6 @@
-import { PendingMessageService } from "@/services/pendingMessageService";
-import { LineNotifyService } from "@/services/lineNotifyService";
-import { MongoRepository } from "@/repositories/mongoDB";
+import { MessageService } from "@/services/messageService";
+import { LineNotifyApiService } from "@/services/lineNotifyApiService";
+import { LineNotifyMessageRepository } from "@/repositories/lineNotifyMessageRepository";
 import { ObjectId, WithId } from "mongodb";
 import {
   LineNotifyPendingMessage,
@@ -9,9 +9,11 @@ import {
 
 jest.mock("@/repositories/mongoDB");
 jest.mock("@/services/lineNotifyService");
-const mock_mongo = MongoRepository as jest.MockedClass<typeof MongoRepository>;
-const mock_lineService = LineNotifyService as jest.MockedClass<
-  typeof LineNotifyService
+const mock_mongo = LineNotifyMessageRepository as jest.MockedClass<
+  typeof LineNotifyMessageRepository
+>;
+const mock_lineService = LineNotifyApiService as jest.MockedClass<
+  typeof LineNotifyApiService
 >;
 
 describe("services/pendingMessageServices.ts", () => {
@@ -21,7 +23,7 @@ describe("services/pendingMessageServices.ts", () => {
   });
 
   test("processPendingMessage will fetch data from mongoDB", async () => {
-    const service = new PendingMessageService();
+    const service = new MessageService();
 
     const repo = mock_mongo.mock.instances[0];
     const lineService = mock_lineService.mock.instances[0];
@@ -39,7 +41,7 @@ describe("services/pendingMessageServices.ts", () => {
   });
 
   test("processPendingMessage will call sendMessageToChatRoom", async () => {
-    const service = new PendingMessageService();
+    const service = new MessageService();
 
     const repo = mock_mongo.mock.instances[0];
     const lineService = mock_lineService.mock.instances[0];
@@ -78,7 +80,7 @@ describe("services/pendingMessageServices.ts", () => {
   });
 
   test("processPendingMessage will update pending message status", async () => {
-    const service = new PendingMessageService();
+    const service = new MessageService();
 
     const repo = mock_mongo.mock.instances[0];
     const lineService = mock_lineService.mock.instances[0];
