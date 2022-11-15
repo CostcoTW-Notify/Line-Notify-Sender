@@ -3,7 +3,7 @@ import {
   pendingStatus,
 } from "@/models/mongoDB/pendingMessage";
 import { MongoRepository } from "./mongoRepository";
-import { Collection, WithId, ObjectId } from "mongodb";
+import { Collection, WithId, ObjectId, MongoClient } from "mongodb";
 
 interface ILineNotifyMessageRepository {
   getMessage(
@@ -29,8 +29,8 @@ export class LineNotifyMessageRepository
 {
   protected lineNotifyCollection: Collection<LineNotifyPendingMessage>;
 
-  constructor(connectionString: string) {
-    super(connectionString);
+  constructor(mongoClient: MongoClient) {
+    super(mongoClient);
     this.lineNotifyCollection =
       this.database.collection<LineNotifyPendingMessage>("LineNotifyMessage");
   }

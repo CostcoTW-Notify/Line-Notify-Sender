@@ -7,6 +7,7 @@ import EnvHelper from "@/utils/envHelper";
 import { LineNotifyApiService } from "@/services/lineNotifyApiService";
 import { AppendPendingMessage } from "@/models/AppendPendingMessageModel";
 import { body } from "express-validator";
+import { MongoClient } from "mongodb";
 
 export class MessageController {
   public static RegisterRoute(app: Application): void {
@@ -16,9 +17,9 @@ export class MessageController {
      * @return {ApiResponse} 200 - success
      */
     app.post("/Message/Pending/Process", async (req, res) => {
-      const repo = new LineNotifyMessageRepository(
-        EnvHelper.GetMongoConnectionString()
-      );
+      const mongo = new MongoClient(EnvHelper.GetMongoConnectionString());
+      await mongo.connect();
+      const repo = new LineNotifyMessageRepository(mongo);
       const notifyService = new LineNotifyApiService();
 
       const service = new MessageService(repo, notifyService);
@@ -34,6 +35,8 @@ export class MessageController {
           .json(
             new ApiResponse(ResponseStatus.ProcessPendingMessageFail, reason)
           );
+      } finally {
+        await mongo.close();
       }
     });
 
@@ -59,8 +62,10 @@ export class MessageController {
       async (req: Request, res) => {
         ensureRequestIsValid(req);
 
+        const mongo = new MongoClient(EnvHelper.GetMongoConnectionString());
+        await mongo.connect();
         const service = new MessageService(
-          new LineNotifyMessageRepository(EnvHelper.GetMongoConnectionString()),
+          new LineNotifyMessageRepository(mongo),
           new LineNotifyApiService()
         );
 
@@ -79,6 +84,8 @@ export class MessageController {
             .json(
               new ApiResponse(ResponseStatus.AppendPendingMessageFail, reason)
             );
+        } finally {
+          await mongo.close();
         }
       }
     );
