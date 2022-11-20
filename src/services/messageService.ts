@@ -4,7 +4,6 @@ import {
 } from "@/models/mongoDB/pendingMessage";
 import { LineNotifyMessageRepository } from "@/repositories/lineNotifyMessageRepository";
 import { LineNotifyApiService } from "@/services/lineNotifyApiService";
-import { throws } from "assert";
 
 interface PendingMessageResult {
   Status: boolean;
