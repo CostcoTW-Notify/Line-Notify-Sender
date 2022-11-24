@@ -5,7 +5,7 @@ import { LineNotifyMessageRepository } from "@/repositories/lineNotifyMessageRep
 import { ensureRequestIsValid } from "@/utils/validate";
 import EnvHelper from "@/utils/envHelper";
 import { LineNotifyApiService } from "@/services/lineNotifyApiService";
-import { AppendPendingMessage } from "@/models/AppendPendingMessageModel";
+import { AppendPendingMessage } from "@/models/appendPendingMessageModel";
 import { body } from "express-validator";
 import { MongoClient } from "mongodb";
 
