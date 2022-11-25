@@ -41,7 +41,7 @@ export class IntergrationController {
             event
           );
 
-          res.status(400).json(new ApiResponse());
+          res.json(new ApiResponse());
         } catch (error) {
           let reason = "Process pending message occur exception...";
           if (error instanceof Error) reason = error.message;
