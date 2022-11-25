@@ -6,6 +6,7 @@ import { SampleController } from "@/controllers/sampleController";
 import { LineNotifyController } from "@/controllers/lineNotifyController";
 import { validationErrorHandler } from "@/middleware/validationErrorHandler";
 import { MessageController } from "./controllers/MessageController";
+import { IntergrationController } from "@/controllers/intergrationController";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(morgan("dev"));
 SampleController.registerRouter(app);
 LineNotifyController.RegisterRoute(app);
 MessageController.RegisterRoute(app);
+IntergrationController.RegisterRoute(app);
 
 const spec = expressJSDocSwagger(app)(swaggerSetting);
 

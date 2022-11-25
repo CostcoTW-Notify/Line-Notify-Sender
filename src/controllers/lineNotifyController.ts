@@ -2,6 +2,7 @@ import { Application, Request } from "express";
 import { body } from "express-validator";
 import { ensureRequestIsValid } from "@/utils/validate";
 import { ApiResponse, ResponseStatus } from "@/models/apiResponse";
+import { SendNotifyMessage } from "@/models/lineNotifyModel";
 import { LineNotifyApiService } from "@/services/lineNotifyApiService";
 
 export class LineNotifyController {
